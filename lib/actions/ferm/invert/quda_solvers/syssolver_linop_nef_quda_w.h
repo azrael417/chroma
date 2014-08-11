@@ -398,80 +398,80 @@ namespace Chroma
 			Real twoKappaB = Real(1)/invTwoKappaB;
 			Real twoKappaC = Real(1)/invTwoKappaC;
 
-#if 1
+#if 0
 			// Test code....
 			{
-				const multi1d<int>& latdims = Layout::subgridLattSize();
-				int halfsize=latdims[0]*latdims[1]*latdims[2]*latdims[3]/2;
-				int fermsize=halfsize*Nc*Ns*2;
+			const multi1d<int>& latdims = Layout::subgridLattSize();
+			int halfsize=latdims[0]*latdims[1]*latdims[2]*latdims[3]/2;
+			int fermsize=halfsize*Nc*Ns*2;
 	
-				// In1 is input to Chroma, Out1 is result
-				multi1d<T> in1( this->size() );
-				multi1d<T> out1(this->size() );
+			// In1 is input to Chroma, Out1 is result
+			multi1d<T> in1( this->size() );
+			multi1d<T> out1(this->size() );
 
-				// In2 is input to QUDA, Out2 is result
-				multi1d<T> in2( this->size() );
-				multi1d<T> out2(this->size() );
+			// In2 is input to QUDA, Out2 is result
+			multi1d<T> in2( this->size() );
+			multi1d<T> out2(this->size() );
 
 	
-				for(int s=0; s < this->size(); s++ ) { 
-					gaussian(in1[s]);  // Gaussian into in1
-					in2[s] = in1[s];   // copy to in2
+			for(int s=0; s < this->size(); s++ ) { 
+			gaussian(in1[s]);  // Gaussian into in1
+			in2[s] = in1[s];   // copy to in2
 	  
-				}
+			}
 
-				for(int d=0; d < 2; d++) { 
-					for(int s=0; s < this->size(); s++ ) { 
-						out1[s]=zero;   // zero both out1 and out2
-						out2[s]=zero;
-					}
+			for(int d=0; d < 2; d++) { 
+			for(int s=0; s < this->size(); s++ ) { 
+			out1[s]=zero;   // zero both out1 and out2
+			out2[s]=zero;
+			}
 	  
-					if ( d==0 ) { 
-						// Apply A to in2
-						QDPIO::cout << "Doing Mat" << endl;
-						(*A)(out2, in2, PLUS);
-					}
-					else {
-						QDPIO::cout << "Doing MatDag" << endl;
-						(*A)(out2, in2, MINUS);
-					}
+			if ( d==0 ) { 
+			// Apply A to in2
+			QDPIO::cout << "Doing Mat" << endl;
+			(*A)(out2, in2, PLUS);
+			}
+			else {
+			QDPIO::cout << "Doing MatDag" << endl;
+			(*A)(out2, in2, MINUS);
+			}
 	    
-					// Copy in1 into QUDA
-					REAL* spinorIn = new REAL[quda_inv_param.Ls*fermsize];
-					REAL* spinorOut = new REAL[quda_inv_param.Ls*fermsize];
-					memset((spinorIn), 0, fermsize*quda_inv_param.Ls*sizeof(REAL));
-					memset((spinorOut), 0, fermsize*quda_inv_param.Ls*sizeof(REAL));
+			// Copy in1 into QUDA
+			REAL* spinorIn = new REAL[quda_inv_param.Ls*fermsize];
+			REAL* spinorOut = new REAL[quda_inv_param.Ls*fermsize];
+			memset((spinorIn), 0, fermsize*quda_inv_param.Ls*sizeof(REAL));
+			memset((spinorOut), 0, fermsize*quda_inv_param.Ls*sizeof(REAL));
 	  
-					for(unsigned int s=0; s<quda_inv_param.Ls; s++){
-						memcpy((&spinorIn[fermsize*s]),&(in1[s].elem(rb[1].start()).elem(0).elem(0).real()),fermsize*sizeof(REAL));
-					}
+			for(unsigned int s=0; s<quda_inv_param.Ls; s++){
+			memcpy((&spinorIn[fermsize*s]),&(in1[s].elem(rb[1].start()).elem(0).elem(0).real()),fermsize*sizeof(REAL));
+			}
 	  
-					// Apply QUDA
-					if( d==0 ) { 
-						quda_inv_param.dagger = QUDA_DAG_NO;
-						MatQuda((void *)spinorOut, (void *)spinorIn, (QudaInvertParam*)&quda_inv_param);
-					}
-					else {
-						quda_inv_param.dagger = QUDA_DAG_YES;
-						MatQuda((void *)spinorOut, (void *)spinorIn, (QudaInvertParam*)&quda_inv_param);
-					}
+			// Apply QUDA
+			if( d==0 ) { 
+			quda_inv_param.dagger = QUDA_DAG_NO;
+			MatQuda((void *)spinorOut, (void *)spinorIn, (QudaInvertParam*)&quda_inv_param);
+			}
+			else {
+			quda_inv_param.dagger = QUDA_DAG_YES;
+			MatQuda((void *)spinorOut, (void *)spinorIn, (QudaInvertParam*)&quda_inv_param);
+			}
 
-					for(unsigned int s=0; s<quda_inv_param.Ls; s++){
-						memcpy((&out1[s].elem(rb[1].start()).elem(0).elem(0).real()),(&spinorOut[fermsize*s]),fermsize*sizeof(REAL));
-					}
+			for(unsigned int s=0; s<quda_inv_param.Ls; s++){
+			memcpy((&out1[s].elem(rb[1].start()).elem(0).elem(0).real()),(&spinorOut[fermsize*s]),fermsize*sizeof(REAL));
+			}
 	  
-					// Now compare out1 and out2
-					for(int s=0; s < this->size();s++) { 
-						out1[s] *= invTwoKappaB;
+			// Now compare out1 and out2
+			for(int s=0; s < this->size();s++) { 
+			out1[s] *= invTwoKappaB;
 	    
-						QDPIO::cout << "s=" << s << "  diff=" << norm2(out2[s]-out1[s]) << endl;
-					}
+			QDPIO::cout << "s=" << s << "  diff=" << norm2(out2[s]-out1[s]) << endl;
+			}
 
 
-					delete [] spinorIn;
-					delete [] spinorOut;
-				}
-				exit(1);
+			delete [] spinorIn;
+			delete [] spinorOut;
+			}
+			exit(1);
 
 
 			}
