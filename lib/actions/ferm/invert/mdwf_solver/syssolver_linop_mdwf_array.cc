@@ -67,11 +67,12 @@ namespace Chroma
 
   namespace { 
 
-    double gaugeReader(int mu,	
+    void gaugeReader(double* value_re,
+				double* value_im,
+				int mu,	
 		       const int latt_coord[4],
 		       int row,
 		       int col,
-		       int reim,
 		       void *env)
     {
       START_CODE();
@@ -94,23 +95,23 @@ namespace Chroma
       // NOTE: it would be nice to use the "peek" functions, but they will
       // broadcast to all nodes the value since they are platform independent.
       // We don't want that, so we poke into the on-node data
-      double val = (reim == 0) ? 
-	toDouble(u[mu].elem(linear).elem().elem(row,col).real()) : 
-	toDouble(u[mu].elem(linear).elem().elem(row,col).imag());
-
+		 (*value_re)=toDouble(u[mu].elem(linear).elem().elem(row,col).real());
+		 (*value_im)=toDouble(u[mu].elem(linear).elem().elem(row,col).imag());
 
       END_CODE();      
-      return val;
+      return;
 
     }
     
     
     // Fermion Reader function - user supplied
-    double fermionReader(const int latt_coord[5],
-			 int color,
-			 int spin,
-			 int reim,
-			 void *env)
+    void fermionReader(
+		double* value_re,
+		double* value_im,
+		const int latt_coord[5],
+		int color,
+		int spin,
+		void *env)
     {
       START_CODE();
 
@@ -134,15 +135,14 @@ namespace Chroma
       // NOTE: it would be nice to use the "peek" functions, but they will
       // broadcast to all nodes the value since they are platform independent.
       // We don't want that, so we poke into the on-node data
-      double val = (reim == 0) ? 
-	double(psi[s].elem(linear).elem(spin).elem(color).real()) : 
-	double(psi[s].elem(linear).elem(spin).elem(color).imag());
+		(*value_re)=double(psi[s].elem(linear).elem(spin).elem(color).real());
+		(*value_im)=double(psi[s].elem(linear).elem(spin).elem(color).imag());
       
       // if (spin >= Ns/2)
       //	val *= -1;
 
       END_CODE();
-      return val;
+      return;
     }
     
       
@@ -152,8 +152,8 @@ namespace Chroma
     void fermionWriter(const int latt_coord[5],
 		       int color, 
 		       int spin,
-		       int reim,
-		       double val,
+		       double value_re,
+			   double value_im,
 		       void *env )
       
     {
@@ -184,10 +184,8 @@ namespace Chroma
       // NOTE: it would be nice to use the "peek" functions, but they will
       // broadcast to all nodes the value since they are platform independent.
       // We don't want that, so we poke into the on-node data
-      if (reim == 0)
-	psi[s].elem(linear).elem(spin).elem(color).real() = val;
-      else
-	psi[s].elem(linear).elem(spin).elem(color).imag() = val;
+	psi[s].elem(linear).elem(spin).elem(color).real() = value_re;
+	psi[s].elem(linear).elem(spin).elem(color).imag() = value_im;
 
       END_CODE();
       return;
@@ -196,7 +194,7 @@ namespace Chroma
     // Env is for the interface spec. I ignore it completely
     void sublattice_func(int lo[],
 			 int hi[],
-			 const int node[],
+			 int node,
 			 void *env) 
     {
       START_CODE();
@@ -206,15 +204,17 @@ namespace Chroma
       // This is the size on the local subgrid. 
       // For QDP++ they are all the same.
       const multi1d<int>& local_subgrid=Layout::subgridLattSize();
+	   const multi1d<int>& node_coords=Layout::nodeCoord();
+	  
       for(int i=0; i <Nd; i++) { 
 	// The lowest coordinate is just the node coordinate
 	// times the local subgrid size in that direction
-	lo[i]=node[i]*local_subgrid[i];
+	lo[i]=node_coords[i]*local_subgrid[i];
 	
 	// The high is the start of the next 'corner'
 	// I would say my hi is hi[i]-1 but am following the 
 	// document conventions
-	hi[i]=(node[i]+1)*local_subgrid[i];
+	hi[i]=(node_coords[i]+1)*local_subgrid[i];
       }
       
       END_CODE();
@@ -484,7 +484,7 @@ namespace Chroma
     // For this I need a function that can tell me the 
     multi1d<int> lattice(5);
     multi1d<int> network(4);
-    multi1d<int> node_coords(4);
+    multi1d<int> node_coords(4), neighbor_up(4), neighbor_down(4);
     int master_p;
     
     // Lattice is the 5D lattice size
@@ -497,6 +497,18 @@ namespace Chroma
       network[mu] = Layout::logicalSize()[mu];
       node_coords[mu] = Layout::nodeCoord()[mu];
     }
+	// compute neighbors
+	for(int mu=0; mu < Nd; mu++) {
+		multi1d<int> tmpcoords=node_coords;
+		
+		//up-neighbor
+		tmpcoords[mu]=node_coords[(mu+1)%network[mu]];
+		neighbor_up[mu]=Layout::nodeNumber(tmpcoords);
+		
+		//down-neighbor
+		tmpcoords[mu]=node_coords[(mu-1+network[mu])%network[mu]];
+		neighbor_down[mu]=Layout::nodeNumber(tmpcoords);
+	}
     
     // Master_p has to be zero on master node and nonzero
     // elsewhere. This is odd.
@@ -510,10 +522,21 @@ namespace Chroma
     // Announce a version just to be nice
     QDPIO::cout << "LinOpSysSolverMDWFArray: Initializing MDWF Library Version " << QOP_MDWF_version() << std::endl;
 
+	//setup layout:
+	QOP_MDWF_Config config;
+	config.self=Layout::nodeNumber();
+	config.master_p=master_p;
+	config.rank=4;
+	config.lat=const_cast<int*>(lattice.slice());
+	config.ls=invParam.N5;
+	config.net=const_cast<int*>(network.slice());
+	config.neighbor_up=const_cast<int*>(neighbor_up.slice());
+	config.neighbor_down=const_cast<int*>(neighbor_down.slice());
+	config.sublattice=sublattice_func;
+	config.env=NULL;
+
     // OK. Let's call Andrew's routine
-    if(  QOP_MDWF_init(&state, lattice.slice(), network.slice(),
-		       node_coords.slice(), master_p, sublattice_func, 
-		       NULL) != 0 ) { 
+    if(  QOP_MDWF_init(&state, &config) != 0 ) { 
       // Nonzero return value => error
       QDPIO::cerr << "MDWF Error: " << QOP_MDWF_error(state) << std::endl;
       QDP_abort(1);
@@ -553,7 +576,6 @@ namespace Chroma
 	QDP_abort(1);
       }
       
-    
     }
     
     END_CODE();
