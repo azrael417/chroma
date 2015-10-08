@@ -44,7 +44,7 @@ void fuzwilp( const multi1d<LatticeColorMatrix>& u,
 { 
   START_CODE();
 
-    
+  /*  
   int lengthr; 
   int lengtht; 
   int lengthrs;
@@ -87,26 +87,26 @@ void fuzwilp( const multi1d<LatticeColorMatrix>& u,
   int r;
   int s;
   int i;
-  int n;
+  int n;*/
 
 /* Check that all direction perpendicular to j_decay are equal. */
-  for(mu = 1;mu  < ( Nd); ++mu )
+/*  for(mu = 1;mu  < ( Nd); ++mu )
     if( mu != j_decay && nrow[mu] != nrow[0] )
     {
       QDPIO::cout << " j_decay = " << j_decay << "and lengthr =" << nrow[0] << std::endl;
       
       QDP_error_exit("Wrong lattice size for Wilson loops: ", mu, nrow[mu]);
-    }
+    }*/
 
   /* First construct the smeared links for mu != j_decay */
   
   /* Copy u's to u_smear */
-  u_smear = u;
+/*  u_smear = u;
 
-  bl_level = 0;
+  bl_level = 0;*/
   
   /* Smear the space-like links n_smear times */
-  for(i = 1;i  <= ( n_smear); ++i )
+/*  for(i = 1;i  <= ( n_smear); ++i )
   {
     for(mu = 0;mu  < ( Nd); ++mu )
     {
@@ -123,7 +123,7 @@ void fuzwilp( const multi1d<LatticeColorMatrix>& u,
     link += sum(real(trace(u_smear[mu])));
 
   link /= double(Layout::vol()*Nd*Nc);
-  QDPIO::cout << "Average link after smearing: " << link << std::endl;
+  QDPIO::cout << "Average link after smearing: " << link << std::endl;*/
 
   
 /* Construct products of smeared links (for mu != j_decay) */
@@ -134,7 +134,7 @@ void fuzwilp( const multi1d<LatticeColorMatrix>& u,
 //     Us  Us  Us
 //     --- --- --- ....
 //
-  mum = -1;
+/*  mum = -1;
   for(mu = 0;mu  < ( Nd); ++mu )
     if( mu != j_decay )
     {
@@ -150,10 +150,10 @@ void fuzwilp( const multi1d<LatticeColorMatrix>& u,
 //
        u_prod[mum][r] = tmp_1;
       }
-    }
+    }*/
     
-  fuz_wlp1 = 0;			/* initialize the planar  Wilson loops */
-  fuz_wlp2 = 0;			/* initialize the nplanar Wilson loops */
+  //fuz_wlp1 = 0;			/* initialize the planar  Wilson loops */
+  //fuz_wlp2 = 0;			/* initialize the nplanar Wilson loops */
 
   /* Compute 'fuzzied' Wilson loops (with normal links in 'time' direction!) */
 
@@ -171,10 +171,10 @@ void fuzwilp( const multi1d<LatticeColorMatrix>& u,
 //	  W = Tr[ U1 * U2 * U3+ * U4+ ]
 //
 
-  for(t = 0;t  < ( lengtht); ++t )
+/*  for(t = 0;t  < ( lengtht); ++t )
   {
 
-    /* Compute product of un-fuzzed links in t (j_decay) direction */
+    // Compute product of un-fuzzed links in t (j_decay) direction 
    QDPIO::cout << "t= " << t << std::endl;
     if( t == 0 )
     {
@@ -183,7 +183,7 @@ void fuzwilp( const multi1d<LatticeColorMatrix>& u,
     else
     {
 	tmp_tog = shift(up_t, FORWARD, j_decay);
-	up_t    = u[j_decay] * tmp_tog; 
+	up_t    = u[j_decay] * tmp_tog; */
 //
 //	| U
 //	| U    last Up shifted up one in t direction
@@ -193,18 +193,18 @@ void fuzwilp( const multi1d<LatticeColorMatrix>& u,
 //      | U
 //		use new up_t for U4 
 //
-    }
+/*    }
 
     mum = -1;
     for(mu = 0;mu  < ( Nd); ++mu )
     {
       if( mu != j_decay )
       {
-	mum = mum + 1;
+	mum = mum + 1;*/
 //   QDPIO::cout << "mu= " << mu << std::endl;
-	for(r = 0;r  < ( lengthr); ++r )
+/*	for(r = 0;r  < ( lengthr); ++r )
 	{
-	    /* Gather 'time-like' link segment from r-direction */
+	    // Gather 'time-like' link segment from r-direction 
 
 	    tmp_tog = shift(up_t, FORWARD, mu);
 	    n = r;
@@ -214,7 +214,7 @@ void fuzwilp( const multi1d<LatticeColorMatrix>& u,
 	      tmp_tog = tmp_1;
 	      n = n - 1;
 	    }
-	    tmp_1 = tmp_tog;   
+	    tmp_1 = tmp_tog;   */
 //
 //	.		|
 //	.		^   tmp_1  (Up shifted r+1 in mu direction)
@@ -224,14 +224,14 @@ void fuzwilp( const multi1d<LatticeColorMatrix>& u,
 
 	    /* Gather 'space-like' link segment from t-direction */
 
-	    tmp_tog = shift(u_prod[mum][r], FORWARD, j_decay);
+/*	    tmp_tog = shift(u_prod[mum][r], FORWARD, j_decay);
 	    n = t;
 	    while( n > 0 )
 	    {
 	      tmp_2 = shift( tmp_tog, FORWARD, j_decay);
 	      tmp_tog = tmp_2;
 	      n = n - 1;
-	    }
+	    }*/
 //
 //
 //	  tmp_tog (u_prod shifted t+1 in t direction)
@@ -245,20 +245,20 @@ void fuzwilp( const multi1d<LatticeColorMatrix>& u,
 //
 	    /* Now complete the planar Wilson loop */
 
-	    tmp_2 = tmp_1 * adj(tmp_tog);
+//	    tmp_2 = tmp_1 * adj(tmp_tog);
 //
 //		U2 * U3+
 //
-	    tmp_1 = tmp_2 * adj(up_t);	
+//	    tmp_1 = tmp_2 * adj(up_t);	
 //
 //		U2 * U3+ * U4+
 //
- 	    tmp_2 = u_prod[mum][r] * tmp_1;
+// 	    tmp_2 = u_prod[mum][r] * tmp_1;
 //
 //		U1 * U2 * U3+ * U4+
 //
-	    wl_trace = real(trace(tmp_2));
-	    fuz_wlp1[r][t] += sum(wl_trace);
+//	    wl_trace = real(trace(tmp_2));
+//	    fuz_wlp1[r][t] += sum(wl_trace);
 
 //  QDPIO::cout << "t= " << t << "   r= " << r << std::endl;
 //  QDPIO::cout << "fuz_wlp1= "  << 2*fuz_wlp1[r][t]/ 
@@ -280,22 +280,22 @@ void fuzwilp( const multi1d<LatticeColorMatrix>& u,
 //	| /r (mu)	
 //	|/ 
 //
-	  nun = -1;
+/*	  nun = -1;
 	  for(nu = 0;nu  < ( Nd); ++nu )
 	  {
 	    if ( nu != j_decay && nu == mu )
-	      /* advance nun, since next "if" is not satisfied! */
+	      // advance nun, since next "if" is not satisfied! 
 	      nun = nun + 1;
 
 	    if ( nu != j_decay && nu != mu )
 	    {
-	      nun = nun + 1;
+	      nun = nun + 1;*/
 //   QDPIO::cout << "nu= " << nu << std::endl;
-	      for(s = 0;s  <= ( r); ++s )
+/*	      for(s = 0;s  <= ( r); ++s )
 	      {
-		/* Construct the 'forward' space-like segments */
+		// Construct the 'forward' space-like segments 
 
-		  /* Gather 'nu link segment' from r-direction */
+		  // Gather 'nu link segment' from r-direction
 
 		  tmp_tog = shift(u_prod[nun][s], FORWARD, mu);
 
@@ -306,7 +306,7 @@ void fuzwilp( const multi1d<LatticeColorMatrix>& u,
 		    tmp_tog = tmp_1;
 		    n = n - 1;
 		  }
-		  u_corn = u_prod[mum][r] * tmp_tog;
+		  u_corn = u_prod[mum][r] * tmp_tog;*/
 //
 //	   ___________
 //	  /     s (nu)
@@ -314,264 +314,264 @@ void fuzwilp( const multi1d<LatticeColorMatrix>& u,
 //	/
 //
 
-		  /* Gather 'mu link segment' from s-direction */
-
-		  tmp_tog = shift(u_prod[mum][r], FORWARD, nu);
-		  n = s;
-		  while( n > 0 )
-		  {
-		    tmp_1 = shift(tmp_tog, FORWARD, nu);
-		    tmp_tog = tmp_1;
-		    n = n -1;
-		  }
-		  u_corn += u_prod[nun][s] * tmp_tog;
+//		  /* Gather 'mu link segment' from s-direction */
 //
-//	              /  
-//	             / r (mu)  	2nd u_corn contribution
-//	____________/
-//	   s (nu)
-
-		/* Now collect to construct the Wilson loop */
-
-		  /* Gather 'time-like' link segment from r-direction first */
-
-		  tmp_tog = shift(up_t, FORWARD, mu);
-		  n = r;
-		  while( n > 0 )
-		  {
-		    tmp_1 = shift(tmp_tog, FORWARD, mu);
-		    tmp_tog = tmp_1;
-		    n = n - 1;
-		  }
-		  tmp_1 = tmp_tog;
-
-		  /* Gather 'time-like' link segment from s-direction next */
-
-		  tmp_tog = shift(tmp_1, FORWARD, nu);
-		  n = s;
-		  while( n > 0 )
-		  {
-		    tmp_2 = shift(tmp_tog, FORWARD, nu);
-		    tmp_tog = tmp_2;
-		    n = n - 1;
-		  }
-		  tmp_1 = tmp_tog;
+//		  tmp_tog = shift(u_prod[mum][r], FORWARD, nu);
+//		  n = s;
+//		  while( n > 0 )
+//		  {
+//		    tmp_1 = shift(tmp_tog, FORWARD, nu);
+//		    tmp_tog = tmp_1;
+//		    n = n -1;
+//		  }
+//		  u_corn += u_prod[nun][s] * tmp_tog;
+////
+////	              /  
+////	             / r (mu)  	2nd u_corn contribution
+////	____________/
+////	   s (nu)
 //
-//  		.	|
-//		.	|
-//	.	.	|
-//    	.	.	^   tmp_1 is now Up shifted by s,t in mu,nu 
-//    	.	.	|
-//    	.	.	|
-//    	.	. . . . |
-//    	.   .
-//	.
+//		/* Now collect to construct the Wilson loop */
 //
-
-		  /* Gather 'space-like' link segment from t-direction */
-
-		  tmp_tog = shift(u_corn, FORWARD, j_decay);
-		  n = t;
-		  while( n > 0 )
-		  {
-		    tmp_2 = shift(tmp_tog, FORWARD, j_decay);
-		    tmp_tog = tmp_2;
-		    n = n - 1;
-         	  }
+//		  /* Gather 'time-like' link segment from r-direction first */
 //
-//	   _____________
-//	  /		.
-//	 /		.
-//	/		.
-//			.	tmp_tog is u_corn shifted by t+1
-//	.		.
-//	.       	.
-//	.   .............
-//	.  .   s (nu)
-//	. . r (mu)	
-//	.. 
+//		  tmp_tog = shift(up_t, FORWARD, mu);
+//		  n = r;
+//		  while( n > 0 )
+//		  {
+//		    tmp_1 = shift(tmp_tog, FORWARD, mu);
+//		    tmp_tog = tmp_1;
+//		    n = n - 1;
+//		  }
+//		  tmp_1 = tmp_tog;
 //
-		  /* Now complete the 'forward' non-planar Wilson loop */
-
-		  tmp_2 = tmp_1 * adj(tmp_tog);
-		  tmp_1 = tmp_2 * adj(up_t);
-		  tmp_2 = u_corn * tmp_1;
-
-
-//			U3 (tmp_tog)
-//		   _____________
-//		  /		|
-//		 /		|
-//		/		|
-//		|		| U2 (tmp_1)
-//		|		|
-// U4 (Up)	|		|
-//		|   ____________|
-//		|  /   
-//		| /   U1 (u_corn)	
-//		|/ 
+//		  /* Gather 'time-like' link segment from s-direction next */
 //
-//    so W = Tr [ U1 * U2 * U3+ * U4+ ]
+//		  tmp_tog = shift(tmp_1, FORWARD, nu);
+//		  n = s;
+//		  while( n > 0 )
+//		  {
+//		    tmp_2 = shift(tmp_tog, FORWARD, nu);
+//		    tmp_tog = tmp_2;
+//		    n = n - 1;
+//		  }
+//		  tmp_1 = tmp_tog;
+////
+////  		.	|
+////		.	|
+////	.	.	|
+////    	.	.	^   tmp_1 is now Up shifted by s,t in mu,nu 
+////    	.	.	|
+////    	.	.	|
+////    	.	. . . . |
+////    	.   .
+////	.
+////
 //
-		  wl_trace = real(trace(tmp_2));
-		  n = r * (r+1) / 2 + s;
-		  fuz_wlp2[n][t] += sum(wl_trace);
-
-		/* Construct the 'backward' space-like segments */
-
-		  /* Gather 'nu link segment' from r-direction */
-
-		  tmp_tog = shift(u_prod[nun][s], FORWARD, mu);
-
-		  n = r;
-		  while( n > 0 )
- 		  {
-		    tmp_1 = shift(tmp_tog, FORWARD, mu);
-		    tmp_tog = tmp_1;
-		    n = n - 1;
-		  }
-		  tmp_1 = tmp_tog;
-
-		  /* Now fetch this from backward s-direction */
-
-		  tmp_tog = shift(tmp_1, BACKWARD, nu);
-		  n = s;
-		  while( n > 0 )
-		  {
-		    tmp_2 = shift(tmp_tog, BACKWARD, nu);
-                    tmp_tog = tmp_2;
-		    n = n - 1;
-		  }
-		  u_corn = u_prod[mum][r] * adj(tmp_tog);
-
-		  /* Gather 'mu link segment' from s-direction */
-
-		  tmp_tog = shift(u_prod[mum][r], BACKWARD, nu);
-		  n = s;
-		  while( n > 0 )
-		  {
-		   tmp_1 = shift(tmp_tog, BACKWARD, nu);
-		   tmp_tog = tmp_1;
-		    n = n - 1;
-		  }
-		  tmp_1 = tmp_tog;
-
-		  /* Gather 'nu link segment' from backward s-direction */
-
-		  tmp_tog = shift(u_prod[nun][s], BACKWARD, nu);
-		  n = s;
-		  while( n > 0 )
-		  {
-		    tmp_2 = shift(tmp_tog, BACKWARD, nu);
-		    tmp_tog = tmp_2;
-		    n = n - 1;
-		  }
-		  u_corn += adj(tmp_tog) * tmp_1;
-
-
-		/* Now collect to construct the Wilson loop */
-
-		  /* Gather 'time-like' link segment from r-direction first */
-
-		  tmp_tog = shift(up_t, FORWARD, mu);
-		  n = r;
-		  while( n > 0 )
-		  {
-		    tmp_1 = shift(tmp_tog, FORWARD, mu);
-		    tmp_tog = tmp_1;
-		    n = n - 1;
-		  }
-		  tmp_1 = tmp_tog;
-
-		  /* Gather 'time-like' link segment from backward s-direction next */
-
-		  tmp_tog = shift(tmp_1, BACKWARD, nu);
-		  n = s;
-		  while( n > 0 )
-		  {
-		    tmp_2 = shift(tmp_tog, BACKWARD, nu);
-		    tmp_tog = tmp_2;
-		    n = n - 1;
-		  }
-		  tmp_1 = tmp_tog;
-
-		  /* Gather 'space-like' link segment from t-direction */
-
-		  tmp_tog = shift(u_corn, FORWARD, j_decay);
-		  n = t;
-		  while( n > 0 )
-		  {
-		    tmp_2 = shift(tmp_tog, FORWARD, j_decay);
-		    tmp_tog = tmp_2;
-		    n = n - 1 ;
-		  }
-
-		  /* Now complete the 'backward' non-planar Wilson loop */
-
-		  tmp_2 = tmp_1 * adj(tmp_tog);
-		  tmp_1 = tmp_2 * adj(up_t);
-		  tmp_2 = u_corn * tmp_1;
-		  wl_trace = real(trace(tmp_2));
-		  n = r * (r+1) / 2 + s;
-		  fuz_wlp2[n][t] += sum(wl_trace);
-
-	      }    /* end s loop */
-	    }      /* end nu != j_decay & nu != mu */
-	  }        /* end nu loop */
-	}          /* end r loop */
-      }            /* end mu != j_decay */
-    }              /* end mu loop */
-  }                /* end t loop */
-
-  ddummy = 1.0 / double (Layout::vol()*Nc*(Nd-1)) ;
-
-  push(xml,"fuz_wlp1");			// XML tag for fuz_wlp1
-  write(xml, "lengthr", lengthr);
-
-  multi1d<Real> wloopr(lengtht);
-  for(r = 0; r < lengthr; ++r)
-  {  
-    for(t = 0; t < lengtht; ++t)
-    {
-      fuz_wlp1[r][t] = fuz_wlp1[r][t] * ddummy;
-      wloopr[t]      = fuz_wlp1[r][t];
-    } 
-    write(xml, "r", r);       
-    write(xml, "wloopr", wloopr);       // write out fuz_wlp1
-  } // end for r 
-  pop(xml);				// XML end tag for fuz_wlp1
-
-   ddummy = 1.0 / double(Layout::vol()*8*Nc*(Nd-1)*(Nd-2) ) ;
-
-  for(t = 0;t  < ( lengtht); ++t )
-  {
-    n = -1;
-    for(r = 0;r  < ( lengthr); ++r )
-      for(s = 0;s  <= ( r); ++s )
-      {
-	n = n + 1;
-	fuz_wlp2[n][t] = fuz_wlp2[n][t] * ddummy;
-      }
-  }
-  multi1d<Real> wlooprs(lengtht);
-  push(xml,"fuz_wlp2");			// XML tag for fuz_wlp2
-  write(xml, "lengthr", lengthr);
-
-  n = -1;
-  for(r = 0; r < lengthr; ++r)
-  {
-    write(xml, "r", r);       
-    for(s = 0;s  <= ( r); ++s )
-      {
-	n = n + 1;
-    	write(xml, "s", s);       
-        for(t = 0; t < lengtht; ++t)
-          wlooprs[t]      = fuz_wlp2[n][t];
-        write(xml, "wlooprs", wlooprs);       // write out fuz_wlp2
-      }  // end for s
-  } // end for r 
-  pop(xml);				// XML end tag for fuz_wlp2
-  QDPIO::cout << "fuz_wlp1 and fuz_wlp2 written to .xml file " << std::endl;
+//		  /* Gather 'space-like' link segment from t-direction */
+//
+//		  tmp_tog = shift(u_corn, FORWARD, j_decay);
+//		  n = t;
+//		  while( n > 0 )
+//		  {
+//		    tmp_2 = shift(tmp_tog, FORWARD, j_decay);
+//		    tmp_tog = tmp_2;
+//		    n = n - 1;
+//         	  }
+////
+////	   _____________
+////	  /		.
+////	 /		.
+////	/		.
+////			.	tmp_tog is u_corn shifted by t+1
+////	.		.
+////	.       	.
+////	.   .............
+////	.  .   s (nu)
+////	. . r (mu)	
+////	.. 
+////
+//		  /* Now complete the 'forward' non-planar Wilson loop */
+//
+//		  tmp_2 = tmp_1 * adj(tmp_tog);
+//		  tmp_1 = tmp_2 * adj(up_t);
+//		  tmp_2 = u_corn * tmp_1;
+//
+//
+////			U3 (tmp_tog)
+////		   _____________
+////		  /		|
+////		 /		|
+////		/		|
+////		|		| U2 (tmp_1)
+////		|		|
+//// U4 (Up)	|		|
+////		|   ____________|
+////		|  /   
+////		| /   U1 (u_corn)	
+////		|/ 
+////
+////    so W = Tr [ U1 * U2 * U3+ * U4+ ]
+////
+//		  wl_trace = real(trace(tmp_2));
+//		  n = r * (r+1) / 2 + s;
+//		  fuz_wlp2[n][t] += sum(wl_trace);
+//
+//		/* Construct the 'backward' space-like segments */
+//
+//		  /* Gather 'nu link segment' from r-direction */
+//
+//		  tmp_tog = shift(u_prod[nun][s], FORWARD, mu);
+//
+//		  n = r;
+//		  while( n > 0 )
+// 		  {
+//		    tmp_1 = shift(tmp_tog, FORWARD, mu);
+//		    tmp_tog = tmp_1;
+//		    n = n - 1;
+//		  }
+//		  tmp_1 = tmp_tog;
+//
+//		  /* Now fetch this from backward s-direction */
+//
+//		  tmp_tog = shift(tmp_1, BACKWARD, nu);
+//		  n = s;
+//		  while( n > 0 )
+//		  {
+//		    tmp_2 = shift(tmp_tog, BACKWARD, nu);
+//                    tmp_tog = tmp_2;
+//		    n = n - 1;
+//		  }
+//		  u_corn = u_prod[mum][r] * adj(tmp_tog);
+//
+//		  /* Gather 'mu link segment' from s-direction */
+//
+//		  tmp_tog = shift(u_prod[mum][r], BACKWARD, nu);
+//		  n = s;
+//		  while( n > 0 )
+//		  {
+//		   tmp_1 = shift(tmp_tog, BACKWARD, nu);
+//		   tmp_tog = tmp_1;
+//		    n = n - 1;
+//		  }
+//		  tmp_1 = tmp_tog;
+//
+//		  /* Gather 'nu link segment' from backward s-direction */
+//
+//		  tmp_tog = shift(u_prod[nun][s], BACKWARD, nu);
+//		  n = s;
+//		  while( n > 0 )
+//		  {
+//		    tmp_2 = shift(tmp_tog, BACKWARD, nu);
+//		    tmp_tog = tmp_2;
+//		    n = n - 1;
+//		  }
+//		  u_corn += adj(tmp_tog) * tmp_1;
+//
+//
+//		/* Now collect to construct the Wilson loop */
+//
+//		  /* Gather 'time-like' link segment from r-direction first */
+//
+//		  tmp_tog = shift(up_t, FORWARD, mu);
+//		  n = r;
+//		  while( n > 0 )
+//		  {
+//		    tmp_1 = shift(tmp_tog, FORWARD, mu);
+//		    tmp_tog = tmp_1;
+//		    n = n - 1;
+//		  }
+//		  tmp_1 = tmp_tog;
+//
+//		  /* Gather 'time-like' link segment from backward s-direction next */
+//
+//		  tmp_tog = shift(tmp_1, BACKWARD, nu);
+//		  n = s;
+//		  while( n > 0 )
+//		  {
+//		    tmp_2 = shift(tmp_tog, BACKWARD, nu);
+//		    tmp_tog = tmp_2;
+//		    n = n - 1;
+//		  }
+//		  tmp_1 = tmp_tog;
+//
+//		  /* Gather 'space-like' link segment from t-direction */
+//
+//		  tmp_tog = shift(u_corn, FORWARD, j_decay);
+//		  n = t;
+//		  while( n > 0 )
+//		  {
+//		    tmp_2 = shift(tmp_tog, FORWARD, j_decay);
+//		    tmp_tog = tmp_2;
+//		    n = n - 1 ;
+//		  }
+//
+//		  /* Now complete the 'backward' non-planar Wilson loop */
+//
+//		  tmp_2 = tmp_1 * adj(tmp_tog);
+//		  tmp_1 = tmp_2 * adj(up_t);
+//		  tmp_2 = u_corn * tmp_1;
+//		  wl_trace = real(trace(tmp_2));
+//		  n = r * (r+1) / 2 + s;
+//		  fuz_wlp2[n][t] += sum(wl_trace);
+//
+//	      }    /* end s loop */
+//	    }      /* end nu != j_decay & nu != mu */
+//	  }        /* end nu loop */
+//	}          /* end r loop */
+//      }            /* end mu != j_decay */
+//    }              /* end mu loop */
+//  }                /* end t loop */
+//
+//  ddummy = 1.0 / double (Layout::vol()*Nc*(Nd-1)) ;
+//
+//  push(xml,"fuz_wlp1");			// XML tag for fuz_wlp1
+//  write(xml, "lengthr", lengthr);
+//
+//  multi1d<Real> wloopr(lengtht);
+//  for(r = 0; r < lengthr; ++r)
+//  {  
+//    for(t = 0; t < lengtht; ++t)
+//    {
+//      fuz_wlp1[r][t] = fuz_wlp1[r][t] * ddummy;
+//      wloopr[t]      = fuz_wlp1[r][t];
+//    } 
+//    write(xml, "r", r);       
+//    write(xml, "wloopr", wloopr);       // write out fuz_wlp1
+//  } // end for r 
+//  pop(xml);				// XML end tag for fuz_wlp1
+//
+//   ddummy = 1.0 / double(Layout::vol()*8*Nc*(Nd-1)*(Nd-2) ) ;
+//
+//  for(t = 0;t  < ( lengtht); ++t )
+//  {
+//    n = -1;
+//    for(r = 0;r  < ( lengthr); ++r )
+//      for(s = 0;s  <= ( r); ++s )
+//      {
+//	n = n + 1;
+//	fuz_wlp2[n][t] = fuz_wlp2[n][t] * ddummy;
+//      }
+//  }
+//  multi1d<Real> wlooprs(lengtht);
+//  push(xml,"fuz_wlp2");			// XML tag for fuz_wlp2
+//  write(xml, "lengthr", lengthr);
+//
+//  n = -1;
+//  for(r = 0; r < lengthr; ++r)
+//  {
+//    write(xml, "r", r);       
+//    for(s = 0;s  <= ( r); ++s )
+//      {
+//	n = n + 1;
+//    	write(xml, "s", s);       
+//        for(t = 0; t < lengtht; ++t)
+//          wlooprs[t]      = fuz_wlp2[n][t];
+//        write(xml, "wlooprs", wlooprs);       // write out fuz_wlp2
+//      }  // end for s
+//  } // end for r 
+//  pop(xml);				// XML end tag for fuz_wlp2
+//  QDPIO::cout << "fuz_wlp1 and fuz_wlp2 written to .xml file " << std::endl;
 }
 
 };
