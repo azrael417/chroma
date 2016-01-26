@@ -410,14 +410,16 @@ namespace Chroma
     }
     
     // Compute actual residual
+    double chinorm;
     {
       multi1d<LatticeFermion>  r(N5);
       A->unprecLinOp(r, psi, PLUS);
       r -= chi;
       res.resid = sqrt(norm2(r));
+      chinorm=sqrt(norm2(chi));
     }
     QDPIO::cout << "MDWF Final: single_iters=" << out_iters_single << " double_iters=" << out_iters_double << " total_iters=" << res.n_count << std::endl;
-    QDPIO::cout << "MDWF Final: final absolute unprec residuum="<<res.resid<<std::endl;
+    QDPIO::cout << "MDWF Final: final absolute unprec residuum="<<res.resid << " normalized=" << res.resid/chinorm<<std::endl;
     
     END_CODE();
     return res;
