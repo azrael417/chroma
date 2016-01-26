@@ -92,6 +92,7 @@ nobase_include_HEADERS = \
 	actions/ferm/invert/syssolver_eigcg_params.h \
 	actions/ferm/invert/syssolver_OPTeigcg_params.h \
 	actions/ferm/invert/syssolver_OPTeigbicg_params.h \
+	actions/ferm/invert/syssolver_fgmres_dr_params.h \
 	actions/ferm/invert/syssolver_linop_cg.h \
 	actions/ferm/invert/syssolver_linop_cg_timing.h \
 	actions/ferm/invert/syssolver_linop_cg_array.h \
@@ -106,6 +107,7 @@ nobase_include_HEADERS = \
 	actions/ferm/invert/syssolver_linop_bicrstab.h \
 	actions/ferm/invert/syssolver_linop_ibicgstab.h \
 	actions/ferm/invert/syssolver_linop_mr.h \
+	actions/ferm/invert/syssolver_linop_fgmres_dr.h \
 	actions/ferm/invert/syssolver_mdagm_cg.h \
 	actions/ferm/invert/syssolver_mdagm_bicgstab.h \
 	actions/ferm/invert/syssolver_mdagm_ibicgstab.h \
@@ -151,6 +153,9 @@ nobase_include_HEADERS = \
 	actions/gauge/gaugeacts/plaq_plus_spatial_two_plaq_gaugeact.h \
 	actions/gauge/gaugeacts/character_gaugeact.h \
 	actions/gauge/gaugeacts/plaq_plus_two_plaq_gaugeact.h \
+	actions/gauge/gaugeacts/plaq_plus_adj_power_gaugeact.h \
+	actions/gauge/gaugeacts/plaq_plus_plaq_power_gaugeact.h \
+	actions/gauge/gaugeacts/constrained_plaq_gaugeact.h \
 	actions/gauge/gaugeacts/sf_plaq_plus_adjoint_gaugeact.h \
 	actions/gauge/gaugeacts/sf_plaq_plus_two_plaq_gaugeact.h \
 	actions/gauge/gaugeacts/aniso_spectrum_gaugeact.h \
@@ -830,6 +835,7 @@ nobase_include_HEADERS += \
 	meas/inline/glue/inline_wilslp.h \
 	meas/inline/glue/inline_fuzwilp.h \
 	meas/inline/glue/inline_qactden.h \
+	meas/inline/glue/inline_plaq_density.h \
 	meas/inline/glue/inline_qnaive.h \
 	meas/inline/glue/inline_random_transf_gauge.h \
 	meas/inline/glue/inline_glue_matelem_colorvec.h \
@@ -1069,6 +1075,7 @@ libchroma_a_SOURCES = \
 	actions/ferm/invert/syssolver_eigcg_params.cc \
 	actions/ferm/invert/syssolver_OPTeigcg_params.cc \
 	actions/ferm/invert/syssolver_OPTeigbicg_params.cc \
+	actions/ferm/invert/syssolver_fgmres_dr_params.cc \
 	actions/ferm/invert/syssolver_linop_cg.cc \
 	actions/ferm/invert/syssolver_linop_cg_timing.cc \
 	actions/ferm/invert/syssolver_linop_cg_array.cc \
@@ -1095,6 +1102,7 @@ libchroma_a_SOURCES = \
 	actions/ferm/invert/syssolver_linop_bicrstab.cc \
 	actions/ferm/invert/syssolver_linop_ibicgstab.cc \
 	actions/ferm/invert/syssolver_linop_mr.cc \
+	actions/ferm/invert/syssolver_linop_fgmres_dr.cc \
 	actions/ferm/invert/multi_syssolver_cg_params.cc \
 	actions/ferm/invert/multi_syssolver_mr_params.cc \
 	actions/ferm/invert/multi_syssolver_linop_aggregate.cc \
@@ -1122,8 +1130,11 @@ libchroma_a_SOURCES = \
 	actions/gauge/gaugeacts/spatial_two_plaq_gaugeact.cc \
 	actions/gauge/gaugeacts/plaq_plus_spatial_two_plaq_gaugeact.cc \
 	actions/gauge/gaugeacts/plaq_plus_adjoint_gaugeact.cc \
+	actions/gauge/gaugeacts/plaq_plus_adj_power_gaugeact.cc \
+	actions/gauge/gaugeacts/constrained_plaq_gaugeact.cc \
 	actions/gauge/gaugeacts/character_gaugeact.cc \
 	actions/gauge/gaugeacts/plaq_plus_two_plaq_gaugeact.cc \
+	actions/gauge/gaugeacts/plaq_plus_plaq_power_gaugeact.cc \
 	actions/gauge/gaugeacts/sf_plaq_plus_adjoint_gaugeact.cc \
 	actions/gauge/gaugeacts/sf_plaq_plus_two_plaq_gaugeact.cc \
 	actions/gauge/gaugeacts/aniso_spectrum_gaugeact.cc \
@@ -1666,6 +1677,7 @@ libchroma_a_SOURCES += \
 	meas/inline/glue/inline_wilslp.cc \
 	meas/inline/glue/inline_fuzwilp.cc \
 	meas/inline/glue/inline_qactden.cc \
+	meas/inline/glue/inline_plaq_density.cc \
 	meas/inline/glue/inline_qnaive.cc \
 	meas/inline/glue/inline_random_transf_gauge.cc \
 	meas/inline/glue/inline_glue_matelem_colorvec.cc \
@@ -2018,4 +2030,8 @@ nobase_include_HEADERS += actions/ferm/linop/clover_term_bagel_clover.h
 libchroma_a_SOURCES += actions/ferm/linop/clover_term_bagel_clover.cc
 endif
 
+if BUILD_GTEST
+nobase_include_HEADERS += gtest/gtest.h
+libchroma_a_SOURCES += gtest/gtest-all.cc
+endif
 
