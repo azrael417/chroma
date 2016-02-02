@@ -68,6 +68,7 @@ namespace Chroma
     memset(reinterpret_cast<char*>(spinorIn), 0, fermsize*quda_inv_param.Ls*sizeof(REAL));
     memset(reinterpret_cast<char*>(spinorOut), 0, fermsize*quda_inv_param.Ls*sizeof(REAL));
     
+    
     //copy negative parity
 #ifndef BUILD_QUDA_DEVIFACE_SPINOR
     for(unsigned int s=0; s<quda_inv_param.Ls; s++){
