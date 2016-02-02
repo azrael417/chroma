@@ -494,12 +494,9 @@ namespace Chroma
             QDPIO::cout << "s=" << s << "  diff=" << norm2(out2[s]-out1[s]) << std::endl;
             }
 
-
             delete [] spinorIn;
             delete [] spinorOut;
             }
-
-
             }
 #endif
 
